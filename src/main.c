@@ -1,5 +1,6 @@
 #include "arena.h"
 #include "config.h"
+#include "enemy.h"
 #include "palette.h"
 #include "player.h"
 #include "puck.h"
@@ -17,6 +18,9 @@ int main ()
     Player player;
     create_player (&player);
 
+    Enemy enemy;
+    create_enemy (&enemy);
+
     while (!WindowShouldClose ())
     {
         ClearBackground (PAL_BACKGROUND);
@@ -25,7 +29,8 @@ int main ()
 
         draw_arena ();
         draw_puck (&puck);
-        draw_player(&player);
+        draw_player (&player);
+        draw_enemy (&enemy);
 
         EndDrawing ();
     }
