@@ -21,7 +21,7 @@ set(GLFW_BUILD_X11 OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     raylib
     GIT_REPOSITORY https://github.com/raysan5/raylib.git
-    GIT_TAG 5.5
+    GIT_TAG 6.2
     GIT_PROGRESS TRUE
 )
 

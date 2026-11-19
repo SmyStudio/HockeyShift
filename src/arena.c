@@ -67,6 +67,10 @@ void draw_arena_borders ()
     DrawRing ((Vector2){left + radius, bottom - radius},
               radius - ARENA_BORDER / 2.0f, radius + ARENA_BORDER / 2.0f, 90.0f,
               180.0f, 32, PAL_ELEMENT);
+
+    // Center circle
+    DrawCircleLinesEx ((Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
+                       ARENA_CENTER_CIRCLE_RADIUS, 10, PAL_HIGHLIGHT);
 }
 
 void draw_arena ()

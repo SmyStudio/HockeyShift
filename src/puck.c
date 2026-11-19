@@ -8,9 +8,8 @@
 
 void create_puck (Puck *puck)
 {
-    *puck = (Puck){
-        (Vector2){SCREEN_WIDTH / 2.0f + PUCK_SIZE / 2.0f, SCREEN_HEIGHT / 2.0f},
-        (Vector2){0.0f, 0.0f}};
+    *puck = (Puck){(Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
+                   (Vector2){0.0f, 0.0f}};
 }
 
 void draw_puck (Puck *puck)

@@ -2,9 +2,9 @@
 
 typedef struct Enemy
 {
-    Rectangle bounds;
+    Vector2 position;
     Vector2 velocity;
 } Enemy;
 
-void create_enemy (Enemy *enemy);
+void create_enemy (Enemy *enemy, int position);
 void draw_enemy (Enemy *enemy);

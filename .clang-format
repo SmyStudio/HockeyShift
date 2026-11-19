@@ -4,3 +4,4 @@ BreakBeforeBraces: Allman
 BreakAfterReturnType: None
 SpaceBeforeParens: Always
 AllowShortFunctionsOnASingleLine: None
+ColumnLimit: 150
