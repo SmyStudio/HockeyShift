@@ -16,7 +16,7 @@ set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
 
 # Linux: Wayland only
 set(GLFW_BUILD_WAYLAND ON CACHE BOOL "" FORCE)
-set(GLFW_BUILD_X11 OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     raylib

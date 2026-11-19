@@ -1,6 +1,6 @@
 #include "game.h"
 #include "arena.h"
-#include <ranlib.h>
+#include <raylib.h>
 
 void create_game (Game *game)
 {
