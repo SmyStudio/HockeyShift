@@ -2,7 +2,6 @@
 #include "game.h"
 #include "palette.h"
 #include <raylib.h>
-#include <stdio.h>
 
 int main ()
 {
@@ -15,6 +14,9 @@ int main ()
 
     while (!WindowShouldClose ())
     {
+        float deltaTime = GetFrameTime ();
+        update_game (&game, deltaTime);
+
         ClearBackground (PAL_BACKGROUND);
 
         BeginDrawing ();

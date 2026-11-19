@@ -13,3 +13,4 @@ typedef struct
 
 void create_game (Game *game);
 void draw_game (Game *game);
+void update_game (Game *game, float deltaTime);
