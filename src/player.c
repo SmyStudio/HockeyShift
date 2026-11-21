@@ -1,9 +1,9 @@
 #include "player.h"
 #include "config.h"
 #include "palette.h"
+#include "physics.h"
 #include <raylib.h>
-
-#define PLAYER_SIZE 60
+#include <raymath.h>
 
 static const Vector2 positions[3] = {(Vector2){.x = SCREEN_WIDTH / 2.0f - ARENA_CENTER_CIRCLE_RADIUS - ENTITY_PLACEMENT_PADDING,
                                                .y = SCREEN_HEIGHT / 2.0f - 2.0f * PLAYER_SIZE - ENTITY_PLACEMENT_PADDING},
@@ -14,7 +14,26 @@ static const Vector2 positions[3] = {(Vector2){.x = SCREEN_WIDTH / 2.0f - ARENA_
 
 void create_player (Player *player, int position)
 {
-    *player = (Player){positions[position], (Vector2){0.0f, 0.0f}};
+    *player = (Player){
+        .position = positions[position],
+        .velocity = {0.0f, 0.0f},
+        .collider = {
+            .type = COLLIDER_CIRCLE,
+            .geometry.circle = {
+                PLAYER_COLLISION_RADIUS,
+                {PLAYER_COLLISION_RADIUS, PLAYER_COLLISION_RADIUS},
+            },
+        },
+    };
+}
+
+void update_player (Player *player, float deltaTime)
+{
+    const float drag = 2.0f;
+    player->position = Vector2Add (
+        player->position,
+        Vector2Scale (player->velocity, deltaTime));
+    apply_friction (&player->velocity, drag, deltaTime);
 }
 
 void draw_player (Player *player)

@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include "collision.h"
 
 #define PUCK_RADIUS 24.0f
 
@@ -6,6 +7,7 @@ typedef struct Puck
 {
     Vector2 position;
     Vector2 velocity;
+    Collider collider;
 } Puck;
 
 void create_puck (Puck *puck);

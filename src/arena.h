@@ -8,11 +8,11 @@
 
 typedef struct
 {
-    CollisionShape colliders[ARENA_COLLIDER_COUNT];
+    Collider colliders[ARENA_COLLIDER_COUNT];
 } Arena;
 
 void arena_init (Arena *arena);
-const CollisionShape *arena_get_colliders (const Arena *arena);
+const Collider *arena_get_colliders (const Arena *arena);
 void draw_arena (const Arena *arena);
 
 #endif

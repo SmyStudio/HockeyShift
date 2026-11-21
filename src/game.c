@@ -1,6 +1,9 @@
 #include "game.h"
-#include "collision.h"
+#include "physics.h"
 #include <raylib.h>
+
+#define COLLISION_RESTITUTION 0.8f
+#define COLLISION_SOLVER_ITERATIONS 3
 
 void create_game (Game *game)
 {
@@ -29,16 +32,35 @@ void update_game (Game *game, float deltaTime)
 {
     update_puck (&game->puck, deltaTime);
 
-    const CollisionShape *colliders = arena_get_colliders (&game->arena);
-
-    for (int i = 0; i < ARENA_COLLIDER_COUNT; i++)
-    {
-        CollisionContact contact;
-        if (collision_circle_vs_shape (game->puck.position, PUCK_RADIUS,
-                                       &colliders[i], &contact))
+    PhysicsBody bodies[1 + MAX_ENTITIES * 2] = {
         {
-            collision_resolve (&game->puck.position, &game->puck.velocity,
-                               contact, 0.9f);
-        }
+            .position = &game->puck.position,
+            .velocity = &game->puck.velocity,
+            .collider = &game->puck.collider,
+            .inverseMass = 1.0f,
+        },
+    };
+
+    for (int i = 0; i < MAX_ENTITIES; i++)
+    {
+        update_player (&game->players[i], deltaTime);
+        update_enemy (&game->enemies[i], deltaTime);
+        bodies[1 + i] = (PhysicsBody){
+            .position = &game->players[i].position,
+            .velocity = &game->players[i].velocity,
+            .collider = &game->players[i].collider,
+            .inverseMass = 0.05f,
+        };
+        bodies[1 + MAX_ENTITIES + i] = (PhysicsBody){
+            .position = &game->enemies[i].position,
+            .velocity = &game->enemies[i].velocity,
+            .collider = &game->enemies[i].collider,
+            .inverseMass = 0.05f,
+        };
     }
+
+    physics_resolve_collisions (
+        bodies, 1 + MAX_ENTITIES * 2,
+        arena_get_colliders (&game->arena), ARENA_COLLIDER_COUNT,
+        COLLISION_RESTITUTION, COLLISION_SOLVER_ITERATIONS);
 }

@@ -5,10 +5,5 @@
         "compilationDatabasePath": "build"
       }
     }
-  },
-  "languages": {
-    "C": {
-      "format_on_save": "on"
-    }
   }
 }

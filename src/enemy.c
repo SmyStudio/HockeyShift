@@ -1,9 +1,9 @@
 #include "enemy.h"
 #include "config.h"
 #include "palette.h"
+#include "physics.h"
 #include <raylib.h>
-
-#define ENEMY_SIZE 60
+#include <raymath.h>
 
 static const Vector2 positions[3] = {
     (Vector2){.x = SCREEN_WIDTH / 2.0f + ARENA_CENTER_CIRCLE_RADIUS + ENTITY_PLACEMENT_PADDING - ENEMY_SIZE,
@@ -15,7 +15,26 @@ static const Vector2 positions[3] = {
 
 void create_enemy (Enemy *enemy, int position)
 {
-    *enemy = (Enemy){positions[position], (Vector2){0.0f, 0.0f}};
+    *enemy = (Enemy){
+        .position = positions[position],
+        .velocity = {0.0f, 0.0f},
+        .collider = {
+            .type = COLLIDER_CIRCLE,
+            .geometry.circle = {
+                ENEMY_COLLISION_RADIUS,
+                {ENEMY_COLLISION_RADIUS, ENEMY_COLLISION_RADIUS},
+            },
+        },
+    };
+}
+
+void update_enemy (Enemy *enemy, float deltaTime)
+{
+    const float drag = 2.0f;
+    enemy->position = Vector2Add (
+        enemy->position,
+        Vector2Scale (enemy->velocity, deltaTime));
+    apply_friction (&enemy->velocity, drag, deltaTime);
 }
 
 void draw_enemy (Enemy *enemy)

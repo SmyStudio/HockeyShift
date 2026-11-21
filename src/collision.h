@@ -6,16 +6,22 @@
 
 typedef enum
 {
-    COLLISION_SHAPE_SEGMENT,
-    COLLISION_SHAPE_ARC
-} CollisionShapeType;
+    COLLIDER_CIRCLE,
+    COLLIDER_SEGMENT,
+    COLLIDER_ARC
+} ColliderType;
 
 typedef struct
 {
-    CollisionShapeType type;
+    ColliderType type;
     float thickness;
     union
     {
+        struct
+        {
+            float radius;
+            Vector2 offset;
+        } circle;
         struct
         {
             Vector2 start;
@@ -31,7 +37,7 @@ typedef struct
             bool centerSideIsAllowed;
         } arc;
     } geometry;
-} CollisionShape;
+} Collider;
 
 typedef struct
 {
@@ -39,10 +45,14 @@ typedef struct
     float penetration;
 } CollisionContact;
 
-bool collision_circle_vs_shape (Vector2 position, float radius,
-                                const CollisionShape *shape,
-                                CollisionContact *contact);
+bool collision_detect (const Collider *first, Vector2 firstPosition,
+                       const Collider *second, Vector2 secondPosition,
+                       CollisionContact *contact);
 void collision_resolve (Vector2 *position, Vector2 *velocity,
                         CollisionContact contact, float restitution);
+void collision_resolve_pair (Vector2 *firstPosition, Vector2 *firstVelocity,
+                             float firstInverseMass, Vector2 *secondPosition,
+                             Vector2 *secondVelocity, float secondInverseMass,
+                             CollisionContact contact, float restitution);
 
 #endif

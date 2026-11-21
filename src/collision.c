@@ -4,11 +4,11 @@
 #include <raymath.h>
 
 static bool collision_circle_vs_segment (Vector2 position, float radius,
-                                         const CollisionShape *shape,
+                                         Vector2 shapePosition, const Collider *shape,
                                          CollisionContact *contact)
 {
-    Vector2 start = shape->geometry.segment.start;
-    Vector2 end = shape->geometry.segment.end;
+    Vector2 start = Vector2Add (shapePosition, shape->geometry.segment.start);
+    Vector2 end = Vector2Add (shapePosition, shape->geometry.segment.end);
     Vector2 inwardNormal = shape->geometry.segment.inwardNormal;
     Vector2 edge = Vector2Subtract (end, start);
     float edgeLengthSquared = Vector2LengthSqr (edge);
@@ -52,10 +52,10 @@ static bool angle_is_on_arc (float angle, float startAngle, float endAngle)
 }
 
 static bool collision_circle_vs_arc (Vector2 position, float radius,
-                                     const CollisionShape *shape,
+                                     Vector2 shapePosition, const Collider *shape,
                                      CollisionContact *contact)
 {
-    Vector2 center = shape->geometry.arc.center;
+    Vector2 center = Vector2Add (shapePosition, shape->geometry.arc.center);
     Vector2 fromCenter = Vector2Subtract (position, center);
     float distance = Vector2Length (fromCenter);
     float angle = atan2f (fromCenter.y, fromCenter.x) * 57.29577951308232f;
@@ -98,18 +98,66 @@ static bool collision_circle_vs_arc (Vector2 position, float radius,
     return true;
 }
 
-bool collision_circle_vs_shape (Vector2 position, float radius,
-                                const CollisionShape *shape,
-                                CollisionContact *contact)
+static bool collision_circle_vs_collider (Vector2 position, float radius,
+                                          Vector2 colliderPosition,
+                                          const Collider *collider,
+                                          CollisionContact *contact)
 {
-    if (shape->type == COLLISION_SHAPE_SEGMENT)
+    if (collider->type == COLLIDER_SEGMENT)
     {
-        return collision_circle_vs_segment (position, radius, shape, contact);
+        return collision_circle_vs_segment (position, radius, colliderPosition, collider, contact);
     }
-    if (shape->type == COLLISION_SHAPE_ARC)
+    if (collider->type == COLLIDER_ARC)
     {
-        return collision_circle_vs_arc (position, radius, shape, contact);
+        return collision_circle_vs_arc (position, radius, colliderPosition, collider, contact);
     }
+    return false;
+}
+
+bool collision_detect (const Collider *first, Vector2 firstPosition,
+                       const Collider *second, Vector2 secondPosition,
+                       CollisionContact *contact)
+{
+    if (first->type == COLLIDER_CIRCLE && second->type == COLLIDER_CIRCLE)
+    {
+        Vector2 firstCenter = Vector2Add (firstPosition, first->geometry.circle.offset);
+        Vector2 secondCenter = Vector2Add (secondPosition, second->geometry.circle.offset);
+        Vector2 difference = Vector2Subtract (firstCenter, secondCenter);
+        float distanceSquared = Vector2LengthSqr (difference);
+        float radiusSum = first->geometry.circle.radius + second->geometry.circle.radius;
+        if (distanceSquared >= radiusSum * radiusSum)
+        {
+            return false;
+        }
+
+        float distance = sqrtf (distanceSquared);
+        contact->normal = distance > 0.0f
+                              ? Vector2Scale (difference, 1.0f / distance)
+                              : (Vector2){1.0f, 0.0f};
+        contact->penetration = radiusSum - distance;
+        return true;
+    }
+
+    if (first->type == COLLIDER_CIRCLE)
+    {
+        Vector2 center = Vector2Add (firstPosition, first->geometry.circle.offset);
+        return collision_circle_vs_collider (
+            center, first->geometry.circle.radius, secondPosition, second, contact);
+    }
+
+    if (second->type == COLLIDER_CIRCLE)
+    {
+        Vector2 center = Vector2Add (secondPosition, second->geometry.circle.offset);
+        if (!collision_circle_vs_collider (
+                center, second->geometry.circle.radius, firstPosition, first, contact))
+        {
+            return false;
+        }
+
+        contact->normal = Vector2Scale (contact->normal, -1.0f);
+        return true;
+    }
+
     return false;
 }
 
@@ -127,4 +175,41 @@ void collision_resolve (Vector2 *position, Vector2 *velocity,
             *velocity,
             Vector2Scale (contact.normal, (1.0f + restitution) * velocityAlongNormal));
     }
+}
+
+void collision_resolve_pair (Vector2 *firstPosition, Vector2 *firstVelocity,
+                             float firstInverseMass, Vector2 *secondPosition,
+                             Vector2 *secondVelocity, float secondInverseMass,
+                             CollisionContact contact, float restitution)
+{
+    float totalInverseMass = firstInverseMass + secondInverseMass;
+    if (totalInverseMass <= 0.0f)
+    {
+        return;
+    }
+
+    float firstShare = firstInverseMass / totalInverseMass;
+    float secondShare = secondInverseMass / totalInverseMass;
+    *firstPosition = Vector2Add (
+        *firstPosition,
+        Vector2Scale (contact.normal, contact.penetration * firstShare));
+    *secondPosition = Vector2Subtract (
+        *secondPosition,
+        Vector2Scale (contact.normal, contact.penetration * secondShare));
+
+    Vector2 relativeVelocity = Vector2Subtract (*firstVelocity, *secondVelocity);
+    float velocityAlongNormal = Vector2DotProduct (relativeVelocity, contact.normal);
+    if (velocityAlongNormal >= 0.0f)
+    {
+        return;
+    }
+
+    float impulseMagnitude = -(1.0f + restitution) * velocityAlongNormal / totalInverseMass;
+    Vector2 impulse = Vector2Scale (contact.normal, impulseMagnitude);
+    *firstVelocity = Vector2Add (
+        *firstVelocity,
+        Vector2Scale (impulse, firstInverseMass));
+    *secondVelocity = Vector2Subtract (
+        *secondVelocity,
+        Vector2Scale (impulse, secondInverseMass));
 }
