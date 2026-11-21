@@ -4,6 +4,9 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#define COLLISION_RESTITUTION 0.8f
+#define COLLISION_SOLVER_ITERATIONS 3
+
 void apply_friction (Vector2 *velocity, float drag, float deltaTime)
 {
     float damping = expf (-drag * deltaTime);
@@ -16,12 +19,11 @@ void apply_friction (Vector2 *velocity, float drag, float deltaTime)
 }
 
 void physics_resolve_collisions (PhysicsBody *bodies, size_t bodyCount,
-                                 const Collider *staticColliders, size_t colliderCount,
-                                 float restitution, size_t solverIterations)
+                                 const Collider *staticColliders, size_t colliderCount)
 {
     const Vector2 staticPosition = {0.0f, 0.0f};
 
-    for (size_t iteration = 0; iteration < solverIterations; iteration++)
+    for (size_t iteration = 0; iteration < COLLISION_SOLVER_ITERATIONS; iteration++)
     {
         for (size_t bodyIndex = 0; bodyIndex < bodyCount; bodyIndex++)
         {
@@ -35,7 +37,7 @@ void physics_resolve_collisions (PhysicsBody *bodies, size_t bodyCount,
                         &staticColliders[colliderIndex], staticPosition, &contact))
                 {
                     collision_resolve (
-                        body->position, body->velocity, contact, restitution);
+                        body->position, body->velocity, contact, COLLISION_RESTITUTION);
                 }
             }
         }
@@ -55,7 +57,7 @@ void physics_resolve_collisions (PhysicsBody *bodies, size_t bodyCount,
                     collision_resolve_pair (
                         first->position, first->velocity, first->inverseMass,
                         second->position, second->velocity, second->inverseMass,
-                        contact, restitution);
+                        contact, COLLISION_RESTITUTION);
                 }
             }
         }

@@ -2,9 +2,6 @@
 #include "physics.h"
 #include <raylib.h>
 
-#define COLLISION_RESTITUTION 0.8f
-#define COLLISION_SOLVER_ITERATIONS 3
-
 void create_game (Game *game)
 {
     *game = (Game){0};
@@ -61,6 +58,5 @@ void update_game (Game *game, float deltaTime)
 
     physics_resolve_collisions (
         bodies, 1 + MAX_ENTITIES * 2,
-        arena_get_colliders (&game->arena), ARENA_COLLIDER_COUNT,
-        COLLISION_RESTITUTION, COLLISION_SOLVER_ITERATIONS);
+        arena_get_colliders (&game->arena), ARENA_COLLIDER_COUNT);
 }

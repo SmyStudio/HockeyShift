@@ -14,7 +14,6 @@ typedef struct
 
 void apply_friction (Vector2 *velocity, float drag, float deltaTime);
 void physics_resolve_collisions (PhysicsBody *bodies, size_t bodyCount,
-                                 const Collider *staticColliders, size_t colliderCount,
-                                 float restitution, size_t solverIterations);
+                                 const Collider *staticColliders, size_t colliderCount);
 
 #endif
