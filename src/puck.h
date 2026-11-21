@@ -1,5 +1,7 @@
 #include <raylib.h>
 
+#define PUCK_RADIUS 24.0f
+
 typedef struct Puck
 {
     Vector2 position;

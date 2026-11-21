@@ -2,7 +2,6 @@
 #include "config.h"
 #include "palette.h"
 #include <raylib.h>
-#include <stdio.h>
 
 #define ARENA_PADDING 20.0f
 #define ARENA_RADIUS 90.0f
@@ -10,70 +9,97 @@
 
 #define GOAL_WIDTH 240.0f
 
-void draw_arena_borders ()
+void arena_init (Arena *arena)
 {
     float left = ARENA_PADDING;
     float top = ARENA_PADDING;
     float right = SCREEN_WIDTH - ARENA_PADDING;
     float bottom = SCREEN_HEIGHT - ARENA_PADDING;
-
     float centerY = SCREEN_HEIGHT / 2.0f;
-    float halfGoal = GOAL_WIDTH / 2.0f;
-
-    float goalTop = centerY - halfGoal;
-    float goalBottom = centerY + halfGoal;
-
+    float goalTop = centerY - GOAL_WIDTH / 2.0f;
+    float goalBottom = centerY + GOAL_WIDTH / 2.0f;
     float radius = ARENA_RADIUS;
+    float thickness = ARENA_BORDER;
 
-    // Top border
-    DrawLineEx ((Vector2){left + radius, top}, (Vector2){right - radius, top},
-                ARENA_BORDER, PAL_ELEMENT);
+    arena->colliders[0] = (CollisionShape){
+        .type = COLLISION_SHAPE_SEGMENT,
+        .thickness = thickness,
+        .geometry.segment = {{left + radius, top}, {right - radius, top}, {0.0f, 1.0f}},
+    };
+    arena->colliders[1] = (CollisionShape){
+        .type = COLLISION_SHAPE_SEGMENT,
+        .thickness = thickness,
+        .geometry.segment = {{left + radius, bottom}, {right - radius, bottom}, {0.0f, -1.0f}},
+    };
 
-    // Bottom border
-    DrawLineEx ((Vector2){left + radius, bottom},
-                (Vector2){right - radius, bottom}, ARENA_BORDER, PAL_ELEMENT);
+    arena->colliders[2] = (CollisionShape){
+        .type = COLLISION_SHAPE_SEGMENT,
+        .thickness = thickness,
+        .geometry.segment = {{left, top + radius}, {left, goalTop}, {1.0f, 0.0f}},
+    };
+    arena->colliders[3] = (CollisionShape){
+        .type = COLLISION_SHAPE_SEGMENT,
+        .thickness = thickness,
+        .geometry.segment = {{left, goalBottom}, {left, bottom - radius}, {1.0f, 0.0f}},
+    };
+    arena->colliders[4] = (CollisionShape){
+        .type = COLLISION_SHAPE_SEGMENT,
+        .thickness = thickness,
+        .geometry.segment = {{right, top + radius}, {right, goalTop}, {-1.0f, 0.0f}},
+    };
+    arena->colliders[5] = (CollisionShape){
+        .type = COLLISION_SHAPE_SEGMENT,
+        .thickness = thickness,
+        .geometry.segment = {{right, goalBottom}, {right, bottom - radius}, {-1.0f, 0.0f}},
+    };
 
-    // Left border (goal opening in the middle)
-    DrawLineEx ((Vector2){left, top + radius}, (Vector2){left, goalTop},
-                ARENA_BORDER, PAL_ELEMENT);
-
-    DrawLineEx ((Vector2){left, goalBottom}, (Vector2){left, bottom - radius},
-                ARENA_BORDER, PAL_ELEMENT);
-
-    // Right border (goal opening in the middle)
-    DrawLineEx ((Vector2){right, top + radius}, (Vector2){right, goalTop},
-                ARENA_BORDER, PAL_ELEMENT);
-
-    DrawLineEx ((Vector2){right, goalBottom}, (Vector2){right, bottom - radius},
-                ARENA_BORDER, PAL_ELEMENT);
-
-    // Rounded corners
-    // Top-left
-    DrawRing ((Vector2){left + radius, top + radius},
-              radius - ARENA_BORDER / 2.0f, radius + ARENA_BORDER / 2.0f,
-              180.0f, 270.0f, 32, PAL_ELEMENT);
-
-    // Top-right
-    DrawRing ((Vector2){right - radius, top + radius},
-              radius - ARENA_BORDER / 2.0f, radius + ARENA_BORDER / 2.0f,
-              270.0f, 360.0f, 32, PAL_ELEMENT);
-
-    // Bottom-right
-    DrawRing ((Vector2){right - radius, bottom - radius},
-              radius - ARENA_BORDER / 2.0f, radius + ARENA_BORDER / 2.0f, 0.0f,
-              90.0f, 32, PAL_ELEMENT);
-
-    // Bottom-left
-    DrawRing ((Vector2){left + radius, bottom - radius},
-              radius - ARENA_BORDER / 2.0f, radius + ARENA_BORDER / 2.0f, 90.0f,
-              180.0f, 32, PAL_ELEMENT);
-
-    // Center circle
-    DrawCircleLinesEx ((Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
-                       ARENA_CENTER_CIRCLE_RADIUS, 10, PAL_HIGHLIGHT);
+    arena->colliders[6] = (CollisionShape){
+        .type = COLLISION_SHAPE_ARC,
+        .thickness = thickness,
+        .geometry.arc = {{left + radius, top + radius}, radius, 180.0f, 270.0f, true},
+    };
+    arena->colliders[7] = (CollisionShape){
+        .type = COLLISION_SHAPE_ARC,
+        .thickness = thickness,
+        .geometry.arc = {{right - radius, top + radius}, radius, 270.0f, 360.0f, true},
+    };
+    arena->colliders[8] = (CollisionShape){
+        .type = COLLISION_SHAPE_ARC,
+        .thickness = thickness,
+        .geometry.arc = {{right - radius, bottom - radius}, radius, 0.0f, 90.0f, true},
+    };
+    arena->colliders[9] = (CollisionShape){
+        .type = COLLISION_SHAPE_ARC,
+        .thickness = thickness,
+        .geometry.arc = {{left + radius, bottom - radius}, radius, 90.0f, 180.0f, true},
+    };
 }
 
-void draw_arena ()
+const CollisionShape *arena_get_colliders (const Arena *arena)
 {
-    draw_arena_borders ();
+    return arena->colliders;
+}
+
+void draw_arena (const Arena *arena)
+{
+    for (int i = 0; i < ARENA_COLLIDER_COUNT; i++)
+    {
+        const CollisionShape *shape = &arena->colliders[i];
+        if (shape->type == COLLISION_SHAPE_SEGMENT)
+        {
+            DrawLineEx (shape->geometry.segment.start, shape->geometry.segment.end,
+                        shape->thickness, PAL_ELEMENT);
+        }
+        else
+        {
+            DrawRing (shape->geometry.arc.center,
+                      shape->geometry.arc.radius - shape->thickness / 2.0f,
+                      shape->geometry.arc.radius + shape->thickness / 2.0f,
+                      shape->geometry.arc.startAngle, shape->geometry.arc.endAngle,
+                      32, PAL_ELEMENT);
+        }
+    }
+
+    DrawCircleLinesEx ((Vector2){SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f},
+                       ARENA_CENTER_CIRCLE_RADIUS, 10, PAL_HIGHLIGHT);
 }

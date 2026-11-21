@@ -1,3 +1,4 @@
+#include "arena.h"
 #include "player.h"
 #include "enemy.h"
 #include "puck.h"
@@ -6,6 +7,7 @@
 
 typedef struct
 {
+    Arena arena;
     Player players[MAX_ENTITIES];
     Enemy enemies[MAX_ENTITIES];
     Puck puck;
