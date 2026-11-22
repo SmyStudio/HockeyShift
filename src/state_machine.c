@@ -67,6 +67,11 @@ int find_best_puck_chaser (Entity players[], const Puck *puck)
 
 void update_state_machine (Entity players[], Entity enemies[], const Puck *puck)
 {
+    for (int i = 0; i < MAX_ENTITIES; i++)
+    {
+        players->role = ROLE_NONE;
+    }
+
     bool assigned[MAX_ENTITIES] = {false};
 
     if (puck->state == PUCK_LOOSE)

@@ -1,6 +1,5 @@
 #include "player.h"
 #include "ai.h"
-#include "config.h"
 #include "palette.h"
 #include "physics.h"
 #include <raylib.h>
@@ -40,7 +39,13 @@ void update_player (Entity *player, float deltaTime)
     apply_friction (&player->velocity, drag, deltaTime);
 }
 
-void draw_player (Entity *player)
+void draw_player (Entity *player, DynamicConfig *config)
 {
+    if (config->shouldRenderDebugEntityData)
+    {
+        const char *stateText = TextFormat("State: %s", entity_role_to_string(player->role));
+        DrawText(stateText, player->position.x, player->position.y - 12.0f, 12, RAYWHITE);
+    }
+
     DrawRectangleRec ((Rectangle){.x = player->position.x, .y = player->position.y, .height = PLAYER_SIZE, .width = PLAYER_SIZE}, PAL_PLAYER);
 }

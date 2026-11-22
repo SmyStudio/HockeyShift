@@ -11,6 +11,7 @@ typedef struct
     Entity players[MAX_ENTITIES];
     Entity enemies[MAX_ENTITIES];
     Puck puck;
+    DynamicConfig config;
 } Game;
 
 void create_game (Game *game);

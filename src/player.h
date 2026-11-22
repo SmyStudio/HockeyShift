@@ -1,4 +1,5 @@
 #include "entity.h"
+#include "config.h"
 #include <raylib.h>
 
 #define PLAYER_SIZE 60.0f
@@ -6,4 +7,4 @@
 
 void create_player (Entity *player, int position);
 void update_player (Entity *player, float deltaTime);
-void draw_player (Entity *player);
+void draw_player (Entity *player, DynamicConfig *config);

@@ -22,12 +22,16 @@ void draw_game (Game *game)
     for (int i = 0; i < MAX_ENTITIES; i++)
     {
         draw_enemy (&game->enemies[i]);
-        draw_player (&game->players[i]);
+        draw_player (&game->players[i], &game->config);
     }
 }
 
 void update_game (Game *game, float deltaTime)
 {
+    if (IsKeyPressed(KEY_F1))
+    {
+        game->config.shouldRenderDebugEntityData = !game->config.shouldRenderDebugEntityData;
+    }
     update_state_machine(game->players, game->enemies, &game->puck);
     update_state_machine_behavior (
         game->players,

@@ -30,4 +30,6 @@ typedef struct
     float score;
 } AIAssignment;
 
+const char *entity_role_to_string (EntityRole role);
+
 #endif
