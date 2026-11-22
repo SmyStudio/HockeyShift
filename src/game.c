@@ -1,5 +1,6 @@
 #include "game.h"
 #include "physics.h"
+#include "state_machine.h"
 #include <raylib.h>
 
 void create_game (Game *game)
@@ -27,6 +28,11 @@ void draw_game (Game *game)
 
 void update_game (Game *game, float deltaTime)
 {
+    update_state_machine(game->players, game->enemies, &game->puck);
+    update_state_machine_behavior (
+        game->players,
+        &game->puck,
+        deltaTime);
     update_puck (&game->puck, deltaTime);
 
     PhysicsBody bodies[1 + MAX_ENTITIES * 2] = {

@@ -1,15 +1,15 @@
 #include "arena.h"
+#include "entity.h"
 #include "player.h"
 #include "enemy.h"
 #include "puck.h"
-
-#define MAX_ENTITIES 3
+#include "config.h"
 
 typedef struct
 {
     Arena arena;
-    Player players[MAX_ENTITIES];
-    Enemy enemies[MAX_ENTITIES];
+    Entity players[MAX_ENTITIES];
+    Entity enemies[MAX_ENTITIES];
     Puck puck;
 } Game;
 

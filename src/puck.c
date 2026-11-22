@@ -14,6 +14,7 @@ void create_puck (Puck *puck)
             .type = COLLIDER_CIRCLE,
             .geometry.circle = {PUCK_RADIUS, {0.0f, 0.0f}},
         },
+        .state = PUCK_LOOSE
     };
 }
 
