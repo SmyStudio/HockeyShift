@@ -43,6 +43,8 @@ typedef struct
 {
     Vector2 normal;
     float penetration;
+    int colliderIndex;
+    int collidedIndex;
 } CollisionContact;
 
 bool collision_detect (const Collider *first, Vector2 firstPosition,

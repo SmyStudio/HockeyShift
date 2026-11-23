@@ -18,13 +18,21 @@ void create_enemy (Entity *enemy, int position)
     *enemy = (Entity){
         .position = positions[position],
         .velocity = {0.0f, 0.0f},
-        .collider = {
+        .bodyCollider = {
             .type = COLLIDER_CIRCLE,
             .geometry.circle = {
                 ENEMY_COLLISION_RADIUS,
                 {0.0f, 0.0f},
             },
         },
+        .puckReachArea = {
+            .type = COLLIDER_CIRCLE,
+            .geometry.circle = {
+                ENEMY_COLLISION_RADIUS * 2.0f,
+                {0.0f, 0.0f}
+            }
+        },
+        .rotation = 0.0f,
         .team = 1,
         .state = AI_NONE,
         .role = ROLE_NONE

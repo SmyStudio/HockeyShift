@@ -6,9 +6,12 @@
   {
     "label": "Debug native binary",
     "build": {
-      "command": "make",
-      "args": ["-j8"],
-      "cwd": "$ZED_WORKTREE_ROOT/build"
+      "command": "sh",
+      "args": [
+        "-c",
+        "cmake -S \"$ZED_WORKTREE_ROOT\" -B \"$ZED_WORKTREE_ROOT/build\" -DCMAKE_BUILD_TYPE=Debug && cmake --build \"$ZED_WORKTREE_ROOT/build\" --parallel 8"
+      ],
+      "cwd": "$ZED_WORKTREE_ROOT"
     },
     "program": "$ZED_WORKTREE_ROOT/build/hockeyshift",
     "request": "launch",

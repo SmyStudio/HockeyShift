@@ -1,5 +1,6 @@
 #include "player.h"
 #include "ai.h"
+#include "collision.h"
 #include "palette.h"
 #include "physics.h"
 #include <raylib.h>
@@ -17,12 +18,19 @@ void create_player (Entity *player, int position)
     *player = (Entity){
         .position = positions[position],
         .velocity = {0.0f, 0.0f},
-        .collider = {
+        .bodyCollider = {
             .type = COLLIDER_CIRCLE,
             .geometry.circle = {
                 PLAYER_COLLISION_RADIUS,
                 {0.0f, 0.0f},
             },
+        },
+        .puckReachArea = {
+            .type = COLLIDER_CIRCLE,
+            .geometry.circle = {
+                PLAYER_COLLISION_RADIUS * 2.0f,
+                {0.0f, 0.0f}
+            }
         },
         .rotation = 0.0f,
         .team = 0,
@@ -42,11 +50,16 @@ void update_player (Entity *player, float deltaTime)
 
 void draw_player (Entity *player, DynamicConfig *config)
 {
-    if (config->shouldRenderDebugEntityData)
-    {
-        const char *stateText = TextFormat("State: %s", entity_role_to_string(player->role));
-        DrawText(stateText, player->position.x, player->position.y - 12.0f, 12, RAYWHITE);
-    }
+    DrawRing((Vector2){
+            .x = player->position.x,
+            .y = player->position.y
+        },
+        PLAYER_SIZE * 2.0f - 1.0f,
+        PLAYER_SIZE * 2.0f,
+        0.0f,
+        360.0f,
+        32,
+        PAL_ELEMENT);
 
     DrawRectanglePro ((Rectangle){
         .x = player->position.x,
@@ -59,4 +72,13 @@ void draw_player (Entity *player, DynamicConfig *config)
         },
         player->rotation,
         PAL_PLAYER);
+
+    if (config->shouldRenderDebugEntityData)
+    {
+        const char *stateText = TextFormat("State: %s", entity_role_to_string(player->role));
+        DrawText(stateText, player->position.x - PLAYER_SIZE / 2.0f, player->position.y - PLAYER_SIZE / 2.0f - 12.0f * 1.0f, 12, RAYWHITE);
+
+        const char *canPickupPuckText = TextFormat("CanPickupPuck: %b", player->canPickupPuck);
+        DrawText(canPickupPuckText, player->position.x - PLAYER_SIZE / 2.0f, player->position.y - PLAYER_SIZE / 2.0f - 12.0f * 2.0f, 12, RAYWHITE);
+    }
 }

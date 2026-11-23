@@ -14,7 +14,7 @@ static void move_entity_toward (Entity *entity, Vector2 target, float deltaTime)
 
     Vector2 center = Vector2Add (
         entity->position,
-        entity->collider.geometry.circle.offset);
+        entity->bodyCollider.geometry.circle.offset);
     Vector2 toTarget = Vector2Subtract (target, center);
     float distance = Vector2Length (toTarget);
 
@@ -79,7 +79,6 @@ void update_state_machine (Entity players[], Entity enemies[], const Puck *puck)
         int chaser = find_best_puck_chaser(players, puck);
         players[chaser].role = ROLE_CHASE_PUCK;
         assigned[chaser] = true;
-        TraceLog(LOG_INFO, "Best chaser: %d", chaser);
     }
 }
 
