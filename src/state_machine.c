@@ -69,7 +69,7 @@ void update_state_machine (Entity players[], Entity enemies[], const Puck *puck)
 {
     for (int i = 0; i < MAX_ENTITIES; i++)
     {
-        players->role = ROLE_NONE;
+        players[i].role = ROLE_NONE;
     }
 
     bool assigned[MAX_ENTITIES] = {false};
@@ -79,6 +79,7 @@ void update_state_machine (Entity players[], Entity enemies[], const Puck *puck)
         int chaser = find_best_puck_chaser(players, puck);
         players[chaser].role = ROLE_CHASE_PUCK;
         assigned[chaser] = true;
+        TraceLog(LOG_INFO, "Best chaser: %d", chaser);
     }
 }
 
