@@ -21,9 +21,10 @@ void create_player (Entity *player, int position)
             .type = COLLIDER_CIRCLE,
             .geometry.circle = {
                 PLAYER_COLLISION_RADIUS,
-                {PLAYER_COLLISION_RADIUS, PLAYER_COLLISION_RADIUS},
+                {0.0f, 0.0f},
             },
         },
+        .rotation = 0.0f,
         .team = 0,
         .state = AI_NONE,
         .role = ROLE_NONE
@@ -47,5 +48,15 @@ void draw_player (Entity *player, DynamicConfig *config)
         DrawText(stateText, player->position.x, player->position.y - 12.0f, 12, RAYWHITE);
     }
 
-    DrawRectangleRec ((Rectangle){.x = player->position.x, .y = player->position.y, .height = PLAYER_SIZE, .width = PLAYER_SIZE}, PAL_PLAYER);
+    DrawRectanglePro ((Rectangle){
+        .x = player->position.x,
+        .y = player->position.y,
+        .height = PLAYER_SIZE,
+        .width = PLAYER_SIZE},
+        (Vector2){
+            .x = PLAYER_SIZE / 2.0f,
+            .y = PLAYER_SIZE / 2.0f
+        },
+        player->rotation,
+        PAL_PLAYER);
 }

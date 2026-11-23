@@ -1,6 +1,5 @@
 #include "enemy.h"
 #include "ai.h"
-#include "config.h"
 #include "palette.h"
 #include "physics.h"
 #include <raylib.h>
@@ -23,7 +22,7 @@ void create_enemy (Entity *enemy, int position)
             .type = COLLIDER_CIRCLE,
             .geometry.circle = {
                 ENEMY_COLLISION_RADIUS,
-                {ENEMY_COLLISION_RADIUS, ENEMY_COLLISION_RADIUS},
+                {0.0f, 0.0f},
             },
         },
         .team = 1,
@@ -41,7 +40,24 @@ void update_enemy (Entity *enemy, float deltaTime)
     apply_friction (&enemy->velocity, drag, deltaTime);
 }
 
-void draw_enemy (Entity *enemy)
+void draw_enemy (Entity *enemy, DynamicConfig *config)
 {
-    DrawRectangleRec ((Rectangle){.x = enemy->position.x, .y = enemy->position.y, .width = ENEMY_SIZE, .height = ENEMY_SIZE}, PAL_ENEMY);
+    if (config->shouldRenderDebugEntityData)
+    {
+        const char *stateText = TextFormat("State: %s", entity_role_to_string(enemy->role));
+        DrawText(stateText, enemy->position.x, enemy->position.y - 12.0f, 12, RAYWHITE);
+    }
+
+    DrawRectanglePro ((Rectangle){
+        .x = enemy->position.x,
+        .y = enemy->position.y,
+        .height = ENEMY_SIZE,
+        .width = ENEMY_SIZE
+        },
+        (Vector2){
+            .x = ENEMY_SIZE / 2.0f,
+            .y = ENEMY_SIZE / 2.0f
+        },
+        enemy->rotation,
+        PAL_ENEMY);
 }

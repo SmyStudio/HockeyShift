@@ -21,7 +21,7 @@ void draw_game (Game *game)
     draw_puck (&game->puck);
     for (int i = 0; i < MAX_ENTITIES; i++)
     {
-        draw_enemy (&game->enemies[i]);
+        draw_enemy (&game->enemies[i], &game->config);
         draw_player (&game->players[i], &game->config);
     }
 }
