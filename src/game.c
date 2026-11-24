@@ -116,7 +116,8 @@ void handle_grabable_puck (Game *game, CollisionContact collisionContacts[], int
             if (collisionContacts[i].colliderIndex >= 1 && collisionContacts[i].colliderIndex <= 3) // Player
             {
                 game->players[collisionContacts[i].colliderIndex - 1].canPickupPuck = true;
-            } else if (collisionContacts[i].colliderIndex >= 4 && collisionContacts[i].colliderIndex <= 6) {
+            } else if (collisionContacts[i].colliderIndex >= 4 && collisionContacts[i].colliderIndex <= 6) // Enemy
+            {
                 game->enemies[collisionContacts[i].colliderIndex - 4].canPickupPuck = true;
             }
         }
